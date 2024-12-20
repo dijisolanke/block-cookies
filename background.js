@@ -1,5 +1,11 @@
 // Whitelist of domains to exempt from cookie blocking
-const whitelist = ["github.com", "google.com", "googleapis.com", "gstatic.com"];
+const whitelist = [
+  "github.com",
+  "google.com",
+  "googleapis.com",
+  "gstatic.com",
+  "youtube.com",
+];
 
 // List of domains known to be persistent with cookies
 const persistentDomains = [
