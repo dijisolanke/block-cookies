@@ -1,23 +1,5 @@
-// Function to clear all cookies
-function clearAllCookies() {
-  chrome.cookies.getAll({}, function (cookies) {
-    for (let cookie of cookies) {
-      let url = `http${cookie.secure ? "s" : ""}://${cookie.domain}${
-        cookie.path
-      }`;
-      chrome.cookies.remove(
-        { url: url, name: cookie.name },
-        function (details) {
-          if (chrome.runtime.lastError) {
-            console.error("Error removing cookie:", chrome.runtime.lastError);
-          } else if (details) {
-            console.log("Cookie removed:", details);
-          }
-        }
-      );
-    }
-  });
-}
+// Whitelist of domains to exempt from cookie blocking
+const whitelist = ["github.com", "google.com", "googleapis.com", "gstatic.com"];
 
 // List of domains known to be persistent with cookies
 const persistentDomains = [
@@ -29,9 +11,37 @@ const persistentDomains = [
   "https://alpha-gpt.mail.yahoo.net",
 ];
 
+// Function to check if a cookie should be removed
+function shouldRemoveCookie(cookie) {
+  return !whitelist.some((domain) => cookie.domain.includes(domain));
+}
+
+// Function to clear all non-whitelisted cookies
+function clearAllCookies() {
+  chrome.cookies.getAll({}, function (cookies) {
+    for (let cookie of cookies) {
+      if (shouldRemoveCookie(cookie)) {
+        let url = `http${cookie.secure ? "s" : ""}://${cookie.domain}${
+          cookie.path
+        }`;
+        chrome.cookies.remove(
+          { url: url, name: cookie.name },
+          function (details) {
+            if (chrome.runtime.lastError) {
+              console.error("Error removing cookie:", chrome.runtime.lastError);
+            } else if (details) {
+              console.log("Cookie removed:", details);
+            }
+          }
+        );
+      }
+    }
+  });
+}
+
 // Listen for changes to cookies
 chrome.cookies.onChanged.addListener(function (changeInfo) {
-  if (!changeInfo.removed) {
+  if (!changeInfo.removed && shouldRemoveCookie(changeInfo.cookie)) {
     console.log("New cookie detected:", changeInfo.cookie);
     const domain = changeInfo.cookie.domain;
 
@@ -52,10 +62,12 @@ chrome.cookies.onChanged.addListener(function (changeInfo) {
 function clearDomainCookies(domain) {
   chrome.cookies.getAll({ domain: domain }, function (cookies) {
     for (let cookie of cookies) {
-      let url = `http${cookie.secure ? "s" : ""}://${cookie.domain}${
-        cookie.path
-      }`;
-      chrome.cookies.remove({ url: url, name: cookie.name });
+      if (shouldRemoveCookie(cookie)) {
+        let url = `http${cookie.secure ? "s" : ""}://${cookie.domain}${
+          cookie.path
+        }`;
+        chrome.cookies.remove({ url: url, name: cookie.name });
+      }
     }
   });
 }
