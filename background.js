@@ -6,6 +6,7 @@ const whitelist = [
   "gstatic.com",
   "youtube.com",
   "netflix.com",
+  "vercel.com",
 ];
 
 // List of domains known to be persistent with cookies
