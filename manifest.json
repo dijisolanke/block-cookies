@@ -6,9 +6,19 @@
   "permissions": ["activeTab", "storage", "cookies"],
   "host_permissions": ["<all_urls>"],
   "action": {
-    "default_title": "Hide Cookie Banners"
+    "default_title": "Hide Cookie Banners",
+    "default_icon": {
+      "16": "./Image-by-brgfx-on-Freepik.png",
+      "48": "./Image-by-brgfx-on-Freepik.png",
+      "128": "./Image-by-brgfx-on-Freepik.png"
+    }
   },
   "background": {
     "service_worker": "background.js"
+  },
+  "icons": {
+    "16": "./Image-by-brgfx-on-Freepik.png",
+    "48": "./Image-by-brgfx-on-Freepik.png",
+    "128": "./Image-by-brgfx-on-Freepik.png"
   }
 }
